@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+	<head>
+		<title>智慧教育云平台</title>
+		<link rel="stylesheet" href="customUI/singleSchool/cjlNewLogin/css/normalize.min.css">
+    	<link rel="stylesheet" href="customUI/singleSchool/cjlNewLogin/swiper/css/swiper.min.css">
+    	<link rel="stylesheet" href="customUI/singleSchool/cjlNewLogin/css/main.css">
+		
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/login.js"></script>
+		<script src="js/CryptoJS/crypto-js.js" type="text/javascript"></script>
+		<script src="js/CryptoJS/core.js" type="text/javascript"></script>
+		<script src="js/CryptoJS/md5.js" type="text/javascript"></script>
+		<script src="js/CryptoJS/evpkdf.js" type="text/javascript"></script>
+		<script src="js/CryptoJS/enc-base64.js" type="text/javascript"></script>
+		<script src="js/CryptoJS/cipher-core.js" type="text/javascript"></script>
+		<script src="js/CryptoJS/aes.js" type="text/javascript"></script>
+		<script src="js/CryptoJS/mode-ecb.js" type="text/javascript"></script>
+		<script src="js/CryptoJS/pad-pkcs7.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			$(function() {
+				$("#nameId").focus(function() {$(this).addClass("white");}).blur(function() {if(this.value==''){$(this).removeClass("white")}});
+				$("#passwordId").focus(function() {$(this).addClass("white");}).blur(function() {if(this.value==''){$(this).removeClass("white")}});
+			});
+			function encrypted(code){
+  				var key = CryptoJS.enc.Utf8.parse("00bjzdhxkjyxgs00");   
+			    var iv  = CryptoJS.enc.Utf8.parse("0102030405060708");   //加密向量
+  				code = CryptoJS.enc.Utf8.parse(code); 
+ 				var encryptedData = CryptoJS.AES.encrypt(code, key, {  
+ 					iv:iv,
+ 				    mode: CryptoJS.mode.CBC,
+ 				    padding: CryptoJS.pad.Pkcs7
+ 				});
+ 				var encryptedStr = encryptedData.ciphertext.toString();
+ 				var encryptedHexStr = CryptoJS.enc.Hex.parse(encryptedStr);
+ 				var encryptedBase64Str = CryptoJS.enc.Base64.stringify(encryptedHexStr);  
+ 				return encryptedBase64Str.toString();
+  		     }
+			function login(){
+				if($.trim($("#nameId").val()) == ""){
+					alert("请填写用户名");
+					return;
+				}
+				if($.trim($("#passwordId").val()) == ""){
+					alert("请填写密码");
+					return;
+				}
+				$("#nameIdHid").val("Crypto"+encrypted($.trim($("#nameId").val())));
+				$("#passwordIdHid").val("Crypto"+encrypted($.trim($("#passwordId").val())));
+				$("#fm1").submit();
+			}
+			
+			$(document).ready(function() {
+				$("#nameId")[0].focus();
+			});
+			function loadAnnouncement(){
+				var url="http://eschool.bjcjl.net/dc/an/announcement!ajaxGetLatelyAnnouncement.action";
+				$.ajax({ 
+					async:false, 
+					url: url, 
+					type: "GET", 
+					dataType: 'jsonp', 
+					jsonp: 'callback', 
+					timeout: 5000, 
+					success: function (jsonObj) {//客户端jquery预先定义好的callback函数,成功获取跨域服务器上的json数据后,会动态执行这个callback函数 
+						$(jsonObj).each(function(i,o){
+							var title=o.title;
+							if(title.length>44){
+								title= title.substring(0,43)+"...";  
+							}
+							if(o.recentFlag=='true'){
+								var html='<li class="hand" title="'+o.title+'" onclick="announceDetail(\'' + o.announcementId + '\');"><span class="fr green">新!</span><span>'+o.createTime+'</span>&nbsp;<a href="javascript:void(0);">'+title+'</a></li>';
+							}else{
+								var html='<li class="hand" title="'+o.title+'" onclick="announceDetail(\'' + o.announcementId + '\');"><span>'+o.createTime+'</span>&nbsp;<a href="javascript:void(0);">'+title+'</a></li>';
+							}
+							$("#announcementList").append(html);
+						}); 
+					}
+				}); 
+	  		}
+			function checkKey(evt) {
+				var evt = evt ? evt : (window.event ? window.event : null); //区分IE和FF来得到event							
+				var code = evt.which ? evt.which :evt.keyCode; //区分IE和FF来得到 event.keyCode 或 event.which
+				if(code == 13){
+					if($.trim($("#nameId").val()) == ""){
+						return;
+					}
+					if($.trim($("#passwordId").val()) == ""){
+						return;
+					}
+					login();
+				}
+			}
+			
+			function moreAnnouncement(){
+				window.open("http://eschool.bjcjl.net/dc/an/announcement!allAnnouncement.action");
+	  		}
+			function announceDetail(id){                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+	  			window.open("http://eschool.bjcjl.net/dc/an/announcement!announceDetail.action?id="+id);               
+	  		}
+			
+	  		function setPasswordQuestion(){
+				var url = "http://eschool.bjcjl.net/dc/bd/passwordQuestion!toUserName.action";
+				window.open(url);
+			}
+		</script>
+</head>
+<body>
+<div class="cjl-logo">
+    <img src="customUI/singleSchool/ui/img/logo1.png" alt="" height="70px">
+</div>
+<div class="swiper-container">
+    <div class=" style="height: 100%;">
+        <div class="swiper-slide"><img src="customUI/singleSchool/ui/img/body_bg1.jpg" alt="" style="margin-top: 100px;"></div>
+      
+      
+    </div>
+		<div style="text-align:center; margin-top:30px;">
+					
+
+<p>智慧教育云平台</p>
+<p style="line-height:30px;cursor: pointer;" onclick="window.open('https://beian.miit.gov.cn/')">京ICP备2023006885号</p>
+<p style="margin-top:20px;"></p>
+</div>
+</div>
+<div class="cjl-login">
+	<uc:form id="welcomeForm" method="post" action="/cas/j_spring_security_check">
+		<uc:hidden id="spring-security-redirect" name="spring-security-redirect"/>
+ 		<form id="fm1" class="clearfix" action="login.htm" method="post">
+ 			<input type="hidden" name="lt" value="LT-31708-R0XRRcbLcABacpl7fciZ0YP2PkilTr" />
+			<input type="hidden" name="execution" value="e1s1" />
+			<input type="hidden" name="_eventId" value="submit" />
+			<input type="hidden" name="schoolCode" value="dataSource1" />
+			<input type="hidden" name="autoAuthToken" id="autoAuthToken"/>
+			<input id="nameIdHid" type="hidden"  name="username" />
+			<input id="passwordIdHid" type="hidden"  name="password" />
+		    <div class="cjl-login-area">
+		        <div class="cjl-login-title">
+		           
+		        </div>
+		        <p class="clearfix cjl-login-input cjl-login-user cjl-white-bg">
+	                <span class="fl">
+	                    <img src="customUI/singleSchool/cjlNewLogin/img/cjl-icon-user.png" alt="">
+	                </span>
+		            <input type="text" tabindex="1" id="nameId" onkeydown="checkKey(event)" placeholder="请输入用户名/手机号" class="fl" autocomplete="off">
+		        </p>
+		        <p class="clearfix cjl-login-input cjl-login-pwd cjl-white-bg">
+	                <span class="fl">
+	                    <img src="customUI/singleSchool/cjlNewLogin/img/cjl-icon-pwd.png" alt="">
+	                </span>
+	         	   <input type="password" tabindex="2" id="passwordId"
+		                 onkeydown="checkKey(event)" placeholder="请输入密码" class="fl" autocomplete="off">
+		        </p>
+		        
+		        <p class="cjl-login-input cjl-login-btn mt20" onclick="login();">登录</p>
+		        <div class="clearfix cjl-login-forget">
+		        	
+		        	
+		        </div>
+		        <li class="login-tip" style="margin-top: 10px;">
+					
+				</li>
+				
+		    </div>
+		</form>
+	</uc:form>
+
+</div>
+
+<script src="customUI/singleSchool/cjlNewLogin/js/jquery-2.1.4.min.js"></script>
+<script src="customUI/singleSchool/cjlNewLogin/swiper/js/swiper.min.js"></script>
+<script type="text/javascript">
+     function refresh(){
+     	$("#vali").attr("src",'captcha.htm?t='+new Date().getTime());
+     }
+     var swiper = new Swiper('.swiper-container',{
+         autoplay:{
+             delay:5000
+         },
+         effect : 'fade',
+        /*  keyboard : true,
+         mousewheel: true, */
+         autoHeight: true
+     });
+     
+</script>
+</body>
+</html>
+
